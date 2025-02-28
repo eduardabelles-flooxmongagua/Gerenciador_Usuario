@@ -1,9 +1,10 @@
 
-//Manipulation the DOM
-var nome = document.querySelector("#exampleInputName"); 
-nome.value = "Name"; 
-nome.style.color = "blue"; 
+//Example
+//var nome = document.querySelector("#exampleInputName"); 
+//nome.value = "Name"; 
+//nome.style.color = "blue"; 
 
+//Manipulation the DOM
 var name = document.querySelector("#exampleInputName");
 var gender = document.querySelectorAll("#form-user-create[name-gender]:checked"); 
 var birth = document.querySelector("#exampleInputBirth");
