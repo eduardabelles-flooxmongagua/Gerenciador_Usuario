@@ -38,8 +38,8 @@ class UserController {
 
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => {
-                //console.error("Erro ao ler o arquivo de imagem.");
-                resolve('dist/img/boxed-bg.jpg'); 
+                console.error("Erro ao ler o arquivo de imagem.");
+                resolve('dist/img/avatar5.png'); 
             };
 
             reader.readAsDataURL(file);
@@ -54,15 +54,15 @@ class UserController {
                 if (field.checked) {
                     user[field.name] = field.value;
                 }
-            } else if (field.name) {
-                user[field.name] = field.value;
+
+                
+
+            } else if (field.name=="admin") {
+                user[field.name] = field.checked;
             }
         });
 
-        if (!user.name || !user.email) {
-            alert("Preencha os campos obrigatórios.");
-            return null; 
-        }
+       
 
         return new User(
             user.name,
@@ -72,7 +72,7 @@ class UserController {
             user.email,
             user.password,
             user.photo,
-            user.admin === "on" || user.admin === true // Converte para booleano
+            user.admin
         );
     }
 
@@ -85,7 +85,7 @@ class UserController {
             </td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin ? "Sim" : "Não"}</td>
+            <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
             <td>${dataUser.birth}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
