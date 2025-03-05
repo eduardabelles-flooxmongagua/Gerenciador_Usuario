@@ -4,7 +4,7 @@ document.getElementById("form-user-create").addEventListener("submit", function(
     function addLine(dataUser) {
         var tr = document.createElement("tr");
     
-        tr.innerHTML = `
+        document.getElementById("table-users").innerHTML= `
             <td>
                 <img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm">
             </td>
@@ -19,7 +19,7 @@ document.getElementById("form-user-create").addEventListener("submit", function(
         `;
     
        
-        document.querySelector("#table-users").appendChild(tr);
+
         
         document.querySelector("#table-users tbody").appendChild(tr);
     }
