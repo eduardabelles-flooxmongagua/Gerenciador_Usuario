@@ -18,8 +18,7 @@ class UserController {
                 this.addLine(values);
             }).catch(error => {
                 console.error("Erro ao carregar a foto:", error);
-                values.photo = "dist/img/default-user.png"; // Em caso de erro, usa a imagem padrão
-                this.addLine(values);
+                values.photo = "dist/img/boxed-bg.jpg"; 
             });
         });
     }
@@ -30,7 +29,7 @@ class UserController {
             let file = fileInput?.files[0];
 
             if (!file) {
-                resolve("dist/img/default-user.png"); // Se não houver imagem, usa a padrão
+                resolve("dist/img/boxed-bg.jpg"); 
                 return;
             }
 
@@ -39,7 +38,7 @@ class UserController {
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => {
                 console.error("Erro ao ler o arquivo de imagem.");
-                resolve('dist/img/avatar5.png'); 
+                resolve('dist/img/boxed-bg.jpg'); 
             };
 
             reader.readAsDataURL(file);
