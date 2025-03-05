@@ -1,21 +1,46 @@
+document.getElementById("form-user-create").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-//Example
-//var nome = document.querySelector("#exampleInputName"); 
-//nome.value = "Name"; 
-//nome.style.color = "blue"; 
+    function addLine(dataUser) {
+        var tr = document.createElement("tr");
+    
+        tr.innerHTML = `
+            <td>
+                <img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm">
+            </td>
+            <td>${dataUser.name}</td>
+            <td>${dataUser.email}</td>
+            <td>${dataUser.admin}</td>
+            <td>${dataUser.birth}</td>
+            <td>
+                <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+            </td>
+        `;
+    
+       
+        document.querySelector("#table-users").appendChild(tr);
+        
+        document.querySelector("#table-users tbody").appendChild(tr);
+    }
+    
 
-//Manipulation DOM
-var name = document.querySelector("#exampleInputName");
-var gender = document.querySelectorAll("#form-user-create[name-gender]:checked"); 
-var birth = document.querySelector("#exampleInputBirth");
-var country = document.querySelector("#exampleInputCountry");  
-var email = document.querySelector("#exampleInputEmail"); 
-var passaword = document.querySelector("#exampleInputPassaword"); 
-var photo = document.querySelector("#exampleInputFile"); 
-var admin = document.querySelector("#exampleInputAdmin");
+    var fields = document.querySelectorAll("#form-user-create [name]"); // Corrigido
+    var user = {};
 
-var fields = document.querySelectorAll("#form-user-create [name]"); 
+    fields.forEach(function(field) {
+        if (field.name === "gender") {
+            if (field.checked) {
+                user[field.name] = field.value;
+            }
+        } else {
+            user[field.name] = field.value;
+        }
+    });
 
-fields.forEach(function(field, index) { 
-    console.log(field.id,field.name,field.value,field.ariaChecked, index); 
+    console.log(user);
+
+   
+    addLine(user);
 });
+
