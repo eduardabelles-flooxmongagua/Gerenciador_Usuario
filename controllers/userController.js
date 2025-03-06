@@ -1,4 +1,4 @@
-class UserController { 
+class UserController {
     constructor(formId, tableId) {
         this.formEl = document.getElementById(formId);
         this.tableEl = document.getElementById(tableId);
@@ -17,19 +17,24 @@ class UserController {
             
             if (!values) {
                 if (btn) btn.disabled = false;
-                return;
+                return false;
             }
 
             this.getPhoto().then(content => {
                 values.photo = content || "dist/img/default-user.png"; 
+                values.register = new Date(); 
+
+                console.log("Valores antes de adicionar à lista:", values);
+
                 this.addLine(values);
               
                 this.formEl.reset();
-                if (btn) btn.disabled = false; 
-
+                if (btn) btn.disabled = false;
             }).catch(error => {
                 console.error("Erro ao carregar a foto:", error);
                 values.photo = "dist/img/boxed-bg.jpg"; 
+                values.register = new Date();
+
                 this.addLine(values);
                 if (btn) btn.disabled = false;
             });
@@ -37,7 +42,7 @@ class UserController {
     }
 
     getPhoto() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             let fileInput = this.formEl.querySelector("[name=photo]");
             let file = fileInput?.files[0];
 
@@ -60,18 +65,19 @@ class UserController {
 
     getValues() {
         let user = {};
-        let isValid=true;
+        let isValid = true;
 
         [...this.formEl.elements].forEach(field => {
-         if(['name', 'email', 'passaword'].indexOf(field.name)>-1 && !field.value){
-            field.parentElement.classList.add('has-error');
-            isValid=false; 
-            //return false; 
-        }
-        
-        
-            if (!field.name) return;
+            if (['name', 'email', 'password'].indexOf(field.name) > -1) {
+                if (!field.value) {
+                    field.parentElement.classList.add('has-error');
+                    isValid = false;
+                } else {
+                    field.parentElement.classList.remove('has-error');
+                }
+            }
 
+            if (!field.name) return;
             if (field.type === "radio" && !field.checked) return;
 
             if (field.type === "checkbox") {
@@ -80,28 +86,27 @@ class UserController {
                 user[field.name] = field.value;
             }
         });
-          if(!isValid){
-            return false;
-          }
-        return new User(
-            user.name,
-            user.gender,
-            user.birth,
-            user.country,
-            user.email,
-            user.password,
-            user.photo,
-            user.admin
-        );
+
+        if (!isValid) return false;
+
+        return {
+            name: user.name,
+            gender: user.gender,
+            birth: user.birth,
+            country: user.country,
+            email: user.email,
+            password: user.password,
+            photo: user.photo,
+            admin: user.admin,
+            register: new Date()
+        };
     }
 
     addLine(dataUser) {
         let tr = document.createElement("tr");
-
+        tr.dataset.user = JSON.stringify(dataUser);
         tr.innerHTML = `
-            <td>
-                <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm">
-            </td>
+            <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
             <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
@@ -113,5 +118,22 @@ class UserController {
         `;
 
         this.tableEl.appendChild(tr);
+        this.updateCount();
+    }
+
+    updateCount() {
+        let numberUsers = 0;
+        let numberAdmin = 0;
+
+        [...this.tableEl.children].forEach(tr => {
+            numberUsers++;
+            let user = JSON.parse(tr.dataset.user);
+            if (user.admin) numberAdmin++;
+        });
+
+        document.querySelector("#number-users").innerHTML = numberUsers;
+        document.querySelector("#number-users-admin").innerHTML = numberAdmin;
     }
 }
+
+
