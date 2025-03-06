@@ -60,8 +60,16 @@ class UserController {
 
     getValues() {
         let user = {};
+        let isValid=true;
 
         [...this.formEl.elements].forEach(field => {
+         if(['name', 'email', 'passaword'].indexOf(field.name)>-1 && !field.value){
+            field.parentElement.classList.add('has-error');
+            isValid=false; 
+            //return false; 
+        }
+        
+        
             if (!field.name) return;
 
             if (field.type === "radio" && !field.checked) return;
@@ -72,7 +80,9 @@ class UserController {
                 user[field.name] = field.value;
             }
         });
-
+          if(!isValid){
+            return false;
+          }
         return new User(
             user.name,
             user.gender,
@@ -95,7 +105,7 @@ class UserController {
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
             <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
-            <td>${dataUser.register || new Date().toLocaleDateString()}</td>
+            <td>${Utils.dateFormat(dataUser.register)}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
