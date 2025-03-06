@@ -1,4 +1,4 @@
-class UserController {
+class UserController { 
     constructor(formId, tableId) {
         this.formEl = document.getElementById(formId);
         this.tableEl = document.getElementById(tableId);
@@ -9,16 +9,29 @@ class UserController {
     onSubmit() {
         this.formEl.addEventListener("submit", event => {
             event.preventDefault();
+                 
+            let btn = this.formEl.querySelector("[type=submit]");
+            if (btn) btn.disabled = true;
 
             let values = this.getValues();
-            if (!values) return;
+            
+            if (!values) {
+                if (btn) btn.disabled = false;
+                return;
+            }
 
             this.getPhoto().then(content => {
                 values.photo = content || "dist/img/default-user.png"; 
                 this.addLine(values);
+              
+                this.formEl.reset();
+                if (btn) btn.disabled = false; 
+
             }).catch(error => {
                 console.error("Erro ao carregar a foto:", error);
                 values.photo = "dist/img/boxed-bg.jpg"; 
+                this.addLine(values);
+                if (btn) btn.disabled = false;
             });
         });
     }
@@ -46,22 +59,19 @@ class UserController {
     }
 
     getValues() {
-        let user = { photo: "" };
+        let user = {};
 
         [...this.formEl.elements].forEach(field => {
-            if (field.name === "gender") {
-                if (field.checked) {
-                    user[field.name] = field.value;
-                }
+            if (!field.name) return;
 
-                
+            if (field.type === "radio" && !field.checked) return;
 
-            } else if (field.name=="admin") {
+            if (field.type === "checkbox") {
                 user[field.name] = field.checked;
+            } else {
+                user[field.name] = field.value;
             }
         });
-
-       
 
         return new User(
             user.name,
@@ -85,7 +95,7 @@ class UserController {
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
             <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
-            <td>${dataUser.birth}</td>
+            <td>${dataUser.register || new Date().toLocaleDateString()}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
