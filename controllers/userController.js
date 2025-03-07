@@ -34,7 +34,10 @@ class UserController {
             this.getPhoto(this.formUpdateEl).then((content) => {
                 result.photo = content !== "dist/img/boxed-bg.jpg" ? content : userOld.photo;
 
-                tr = this.getTr(result, tr); // Passando 'result' em vez de 'user'
+                tr = this.getTr(result, tr);
+                let user = new User();
+                user.loadFromJSON(result);
+
                 this.addEventsTR(tr);
                 this.showPanelCreate();
 
@@ -60,7 +63,7 @@ class UserController {
             }
 
             this.getPhoto(this.formEl).then(content => {
-                values.photo = content || "dist/img/default-user.png";
+                values.photo = content || "dist/img/boxed-bg.jpg";
                 values.register = new Date();
 
                 this.insert(values);
@@ -126,7 +129,16 @@ class UserController {
 
         if (!isValid) return false;
 
+       
+        let users = this.getUsersStorage();
+
+      
+        let userId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1; 
+
+        user.id = userId;
+
         return {
+            id: userId,
             name: user.name,
             gender: user.gender,
             birth: user.birth,
@@ -177,6 +189,7 @@ class UserController {
             <td>${dataUser.email}</td>
             <td>${dataUser.admin ? "Sim" : "Não"}</td>
             <td>${Utils.dateFormat(dataUser.register)}</td>
+          
             <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
