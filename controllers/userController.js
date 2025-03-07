@@ -1,4 +1,4 @@
-class UserController { 
+class UserController {
     constructor(formId, formUpdateId, tableId) {
         this.formEl = document.getElementById(formId);
         this.formUpdateEl = document.getElementById(formUpdateId);
@@ -6,6 +6,7 @@ class UserController {
 
         this.onSubmit();
         this.onEdit();
+        this.selectAll();
     }
 
     onEdit() {
@@ -43,7 +44,7 @@ class UserController {
                         <td>${Utils.dateFormat(result.register)}</td>
                         <td>
                             <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                            <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
                         </td>
                     `;
                     this.addEventsTR(tr);
@@ -75,6 +76,7 @@ class UserController {
                 values.photo = content || "dist/img/default-user.png";
                 values.register = new Date();
 
+                this.insert(values);
                 this.addLine(values);
 
                 this.formEl.reset();
@@ -84,14 +86,16 @@ class UserController {
                 values.photo = "dist/img/boxed-bg.jpg";
                 values.register = new Date();
 
+                this.insert(values);
                 this.addLine(values);
+
                 if (btn) btn.disabled = false;
             });
         });
     }
 
     getPhoto(formEl) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             let fileInput = formEl.querySelector("[name=photo]");
             let file = fileInput?.files[0];
 
@@ -104,7 +108,7 @@ class UserController {
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => {
                 console.error("Erro ao ler o arquivo de imagem.");
-                resolve("dist/img/boxed-bg.jpg");
+                reject("dist/img/boxed-bg.jpg");
             };
 
             reader.readAsDataURL(file);
@@ -148,8 +152,29 @@ class UserController {
         };
     }
 
+    selectAll() {
+        let users = this.getUsersStorage();
+        users.forEach(dataUser => {
+            this.addLine(dataUser);
+        });
+    }
+
+    insert(data) {
+        let users = [];
+        if (sessionStorage.getItem("users")) {
+            users = JSON.parse(sessionStorage.getItem("users"));
+        }
+        users.push(data);
+        sessionStorage.setItem("users", JSON.stringify(users));
+    }
+
+    getUsersStorage() {
+        return sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : [];
+    }
+
     addLine(dataUser) {
         let tr = document.createElement("tr");
+
         tr.dataset.user = JSON.stringify(dataUser);
 
         tr.innerHTML = `
@@ -160,7 +185,7 @@ class UserController {
             <td>${Utils.dateFormat(dataUser.register)}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
             </td>
         `;
 
@@ -170,6 +195,13 @@ class UserController {
     }
 
     addEventsTR(tr) {
+        tr.querySelector(".btn-delete").addEventListener("click", e => {
+            if (confirm("Deseja realmente excluir?")) {
+                tr.remove();
+                this.updateCount();
+            }
+        });
+
         tr.querySelector(".btn-edit").addEventListener("click", e => {
             let json = JSON.parse(tr.dataset.user);
             this.formUpdateEl.dataset.trIndex = tr.sectionRowIndex;
@@ -193,7 +225,6 @@ class UserController {
                     }
                 }
             }
-
 
             let imgEl = this.formUpdateEl.querySelector(".photo");
             if (imgEl) {
