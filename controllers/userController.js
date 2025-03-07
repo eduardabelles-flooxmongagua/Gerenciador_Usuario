@@ -194,7 +194,7 @@ class UserController {
                 }
             }
 
-        
+
             let imgEl = this.formUpdateEl.querySelector(".photo");
             if (imgEl) {
                 imgEl.src = json.photo;
