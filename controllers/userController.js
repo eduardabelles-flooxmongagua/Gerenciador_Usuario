@@ -159,17 +159,18 @@ class UserController {
         });
     }
 
-    insert(data) {
+    getUsersStorage() {
         let users = [];
-        if (sessionStorage.getItem("users")) {
-            users = JSON.parse(sessionStorage.getItem("users"));
+        if (localStorage.getItem("users")) {
+            users = JSON.parse(localStorage.getItem("users"));
         }
-        users.push(data);
-        sessionStorage.setItem("users", JSON.stringify(users));
+        return users;
     }
 
-    getUsersStorage() {
-        return sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : [];
+    insert(data) {
+        let users = this.getUsersStorage();
+        users.push(data);
+        localStorage.setItem("users", JSON.stringify(users));
     }
 
     addLine(dataUser) {
