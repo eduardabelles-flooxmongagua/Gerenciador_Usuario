@@ -35,16 +35,18 @@ class UserController {
                 result.photo = content !== "dist/img/boxed-bg.jpg" ? content : userOld.photo;
 
                 tr = this.getTr(result, tr);
-                let user = new User();
-                user.loadFromJSON(result);
-
                 this.addEventsTR(tr);
-                this.showPanelCreate();
 
-                this.formUpdateEl.reset();
-                if (btn) btn.disabled = false;
+                // **Atualizar o LocalStorage**
+                let users = this.getUsersStorage();
+                users[index] = result;
+                localStorage.setItem("users", JSON.stringify(users));
 
                 this.updateCount();
+                this.showPanelCreate();
+                this.formUpdateEl.reset();
+
+                if (btn) btn.disabled = false;
             });
         });
     }
@@ -129,10 +131,7 @@ class UserController {
 
         if (!isValid) return false;
 
-       
         let users = this.getUsersStorage();
-
-      
         let userId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1; 
 
         user.id = userId;
@@ -189,7 +188,6 @@ class UserController {
             <td>${dataUser.email}</td>
             <td>${dataUser.admin ? "Sim" : "Não"}</td>
             <td>${Utils.dateFormat(dataUser.register)}</td>
-          
             <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
@@ -202,6 +200,14 @@ class UserController {
     addEventsTR(tr) {
         tr.querySelector(".btn-delete").addEventListener("click", e => {
             if (confirm("Deseja realmente excluir?")) {
+                let users = this.getUsersStorage();
+                users = users.filter(user => user.id !== JSON.parse(tr.dataset.user).id);
+                localStorage.setItem("users", JSON.stringify(users));
+
+                let user = new User();
+                user.loadFromJSON(JSON.parse(tr.dataset.user));
+               
+
                 tr.remove();
                 this.updateCount();
             }
@@ -251,16 +257,8 @@ class UserController {
     }
 
     updateCount() {
-        let numberUsers = 0;
-        let numberAdmin = 0;
-
-        [...this.tableEl.children].forEach(tr => {
-            numberUsers++;
-            let user = JSON.parse(tr.dataset.user);
-            if (user.admin) numberAdmin++;
-        });
-
-        document.querySelector("#number-users").innerHTML = numberUsers;
-        document.querySelector("#number-users-admin").innerHTML = numberAdmin;
+        let users = this.getUsersStorage();
+        document.querySelector("#number-users").innerHTML = users.length;
+        document.querySelector("#number-users-admin").innerHTML = users.filter(user => user.admin).length;
     }
 }

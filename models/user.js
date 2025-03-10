@@ -87,23 +87,31 @@ class User {
         return id;
     }
 
-
     save() {
         let users = User.getUsersStorage();  
-
-        if (this._id === null || this._id === 0) {
-            this._id = this.getNewId();  
-        }
-
-       
-        const index = users.findIndex(u => u._id === this._id);
-        if (index !== -1) {
-            users[index] = this;  
+    
+        if (this._id > 0) {
+            users = users.map(u => {
+                if (u._id === this._id) { 
+                    return Object.assign({}, u, this);
+                }
+                return u;
+            });
         } else {
-            users.push(this); 
+            this._id = this.getNewID();
+            users.push(this);
         }
-
-     
+    
         localStorage.setItem("users", JSON.stringify(users));
     }
-}
+    removeUser(){
+        let users = User.getUsersStorage();
+        users.forEach((userData, index)=>{
+            if(this._id == userData._id){
+              
+                users.splice(index, 1);
+            }
+        });
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+}    
