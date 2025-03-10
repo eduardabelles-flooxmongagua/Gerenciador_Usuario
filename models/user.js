@@ -78,13 +78,11 @@ class User {
     }
 
    
-    getNewId() {
-        let id = 0;
-        const users = User.getUsersStorage();  
-        if (users.length > 0) {
-            id = Math.max(...users.map(user => user._id)) + 1; 
-        }
-        return id;
+    static getNewID() {
+        let usersID = parseInt(localStorage.getItem("usersID")) || 0;
+        usersID++;
+        localStorage.setItem("usersID", usersID);
+        return usersID;
     }
 
     save() {
@@ -92,8 +90,8 @@ class User {
     
         if (this._id > 0) {
             users = users.map(u => {
-                if (u._id === this._id) { 
-                    return Object.assign({}, u, this);
+                if (u._id === this._id) {
+                    return Object.assign({}, u, this); 
                 }
                 return u;
             });
@@ -104,14 +102,9 @@ class User {
     
         localStorage.setItem("users", JSON.stringify(users));
     }
-    removeUser(){
+    removeUser() {
         let users = User.getUsersStorage();
-        users.forEach((userData, index)=>{
-            if(this._id == userData._id){
-              
-                users.splice(index, 1);
-            }
-        });
+        users = users.filter(user => user._id !== this._id);
         localStorage.setItem("users", JSON.stringify(users));
     }
 }    

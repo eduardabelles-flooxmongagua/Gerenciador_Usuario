@@ -29,17 +29,20 @@ class UserController {
             let index = this.formUpdateEl.dataset.trIndex;
             let tr = this.tableEl.rows[index];
             let userOld = JSON.parse(tr.dataset.user);
+
+         
+            values.id = userOld.id;
+
             let result = Object.assign({}, userOld, values);
 
-            this.getPhoto(this.formUpdateEl).then((content) => {
+            this.getPhoto(this.formUpdateEl).then(content => {
                 result.photo = content !== "dist/img/boxed-bg.jpg" ? content : userOld.photo;
 
                 tr = this.getTr(result, tr);
                 this.addEventsTR(tr);
 
-                // **Atualizar o LocalStorage**
                 let users = this.getUsersStorage();
-                users[index] = result;
+                users = users.map(u => (u.id === result.id ? result : u));
                 localStorage.setItem("users", JSON.stringify(users));
 
                 this.updateCount();
@@ -203,10 +206,6 @@ class UserController {
                 let users = this.getUsersStorage();
                 users = users.filter(user => user.id !== JSON.parse(tr.dataset.user).id);
                 localStorage.setItem("users", JSON.stringify(users));
-
-                let user = new User();
-                user.loadFromJSON(JSON.parse(tr.dataset.user));
-               
 
                 tr.remove();
                 this.updateCount();
